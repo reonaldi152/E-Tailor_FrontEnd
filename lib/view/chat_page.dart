@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -6,48 +8,49 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final _textController = TextEditingController();
-  final List<Message> _messages = [];
+  final TextEditingController _textController = TextEditingController();
+  List<Message> _messages = [];
 
-  void _sendMessage() {
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages(); // Load chat history saat aplikasi dibuka
+  }
+
+  Future<void> _loadMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? messagesJson = prefs.getString('chat_messages');
+
+    if (messagesJson != null) {
+      setState(() {
+        _messages = (jsonDecode(messagesJson) as List)
+            .map((item) => Message.fromJson(item))
+            .toList();
+      });
+    }
+  }
+
+  Future<void> _saveMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String messagesJson =
+        jsonEncode(_messages.map((message) => message.toJson()).toList());
+    await prefs.setString('chat_messages', messagesJson);
+  }
+
+  void _sendMessage() async {
     final text = _textController.text.trim();
     if (text.isNotEmpty) {
       setState(() {
         _messages.add(Message(text: text, isMe: true));
-        _textController.clear();
       });
+      _textController.clear();
+      await _saveMessages(); // Simpan chat setelah mengirim pesan
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Navigasi kembali
-          },
-        ),
-        title: const Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, color: Colors.white),
-            ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('E - Tailor',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Status', style: TextStyle(fontSize: 12)),
-              ],
-            ),
-          ],
-        ),
-      ),
       body: Column(
         children: [
           Expanded(
@@ -59,31 +62,32 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Colors.grey[300]!),
+          _buildInputField(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputField() {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: Colors.grey[300]!)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textController,
+              decoration: const InputDecoration(
+                hintText: 'Mulai Mengirim Pesan...',
+                border: InputBorder.none,
               ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    decoration: const InputDecoration(
-                      hintText: 'Mulai Mengirim Pesan',
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: _sendMessage,
-                  icon: const Icon(Icons.send),
-                  color: Colors.blue,
-                ),
-              ],
-            ),
+          ),
+          IconButton(
+            onPressed: _sendMessage,
+            icon: const Icon(Icons.send, color: Colors.blue),
           ),
         ],
       ),
@@ -96,6 +100,20 @@ class Message {
   final bool isMe;
 
   Message({required this.text, required this.isMe});
+
+  // Convert Message object ke JSON
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'isMe': isMe,
+      };
+
+  // Convert JSON ke Message object
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      text: json['text'],
+      isMe: json['isMe'],
+    );
+  }
 }
 
 class MessageBubble extends StatelessWidget {
@@ -109,8 +127,8 @@ class MessageBubble extends StatelessWidget {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         decoration: BoxDecoration(
           color: isMe ? Colors.blue : Colors.grey[300],
           borderRadius: BorderRadius.circular(16),

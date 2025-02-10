@@ -16,3 +16,28 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+// bottomNavigationBar: BottomNavigationBar(
+//         items: const <BottomNavigationBarItem>[
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.home),
+//             label: 'Home',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.shopping_cart),
+//             label: 'Keranjang',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.chat), // Ikon chat
+//             label: 'Chat',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.person),
+//             label: 'Profile',
+//           ),
+//         ],
+//         currentIndex: _selectedIndex,
+//         selectedItemColor: Colors.blue, // Warna untuk item yang dipilih
+//         unselectedItemColor: Colors
+//             .grey, // Warna untuk item yang tidak dipilih (misalnya abu-abu)
+//         onTap: _onItemTapped,
+//       ),

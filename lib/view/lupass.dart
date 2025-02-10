@@ -28,7 +28,7 @@ class LupaPasswordPage extends StatelessWidget {
                 // Contoh: Menggunakan Firebase Authentication
                 // FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()));
+                    MaterialPageRoute(builder: (context) => LoginPage()));
               },
               child: const Text('Kirim'),
             ),
