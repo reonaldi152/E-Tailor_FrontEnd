@@ -1,134 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/endpoint.dart';
-import 'package:flutter_application_1/config/model/product.dart';
-import 'package:flutter_application_1/config/network.dart';
+import 'package:flutter_application_1/view/KostumProduk.dart';
+import '../models/product_model.dart';
 
-class DetailProduk extends StatefulWidget {
-  final int productId;
+class DetailPage extends StatelessWidget {
+  final ProductModel product;
 
-  const DetailProduk({Key? key, required this.productId}) : super(key: key);
-
-  @override
-  _DetailProdukState createState() => _DetailProdukState();
-}
-
-class _DetailProdukState extends State<DetailProduk> {
-  Product? product;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchProduct();
-  }
-
-  Future<void> fetchProduct() async {
-    var response =
-        await Network.getApi("${Endpoint.productUrl}/${widget.productId}");
-    setState(() {
-      product = Product.fromJson(response['data']);
-      isLoading = false;
-    });
-  }
+  const DetailPage({Key? key, required this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("E - Tailor"),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Gambar Produk
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        product!.image,
-                        width: double.infinity,
-                        height: 180,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Nama Produk
-                    Text(
-                      product!.name,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-
-                    // Pilihan Warna
-                    const Text("Tersedia Warna"),
-                    Row(
-                      children: [
-                        _colorCircle(Colors.black),
-                        _colorCircle(Colors.red),
-                        _colorCircle(Colors.blue),
-                        _colorCircle(Colors.grey),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Stock & Harga
-                    Text("Stock: ${product!.stock}",
-                        style: const TextStyle(fontSize: 16)),
-                    Text("Rp ${product!.price}/Meter",
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-
-                    // Deskripsi Produk
-                    Text(
-                      product!.description,
-                      style: const TextStyle(fontSize: 14),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ],
-                ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Gambar Produk
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                product.image,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, size: 200),
               ),
             ),
-      bottomNavigationBar: BottomAppBar(
-        child: SizedBox(
-          height: 50,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              // TODO: Implementasi pembayaran
-            },
-            icon: const Icon(Icons.shopping_cart),
-            label: const Text("Lakukan Pembayaran"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
+            const SizedBox(height: 16),
+
+            // Nama Produk
+            Center(
+              child: Text(
+                product.name,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
+            const SizedBox(height: 8),
+
+            // Warna Produk
+            const Text("Tersedia Warna",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _buildColorCircle(Colors.red),
+                _buildColorCircle(Colors.black),
+                _buildColorCircle(Colors.blue),
+                _buildColorCircle(Colors.grey),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Stok Produk
+            Text("Stock: ${product.stock}",
+                style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 8),
+
+            // Harga Produk
+            Text("RP : ${product.price}/Meter",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+
+            // Deskripsi Produk
+            Text(product.description,
+                textAlign: TextAlign.justify,
+                style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+
+      // Tombol Pembayaran
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(10),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => KostumProdukScreen(product: product),
+              ),
+            );
+          },
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.shopping_cart, color: Colors.white),
+              SizedBox(width: 8),
+              Text("Lakukan Pembayaran", style: TextStyle(fontSize: 18)),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _colorCircle(Color color) {
+  Widget _buildColorCircle(Color color) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
+      margin: const EdgeInsets.only(right: 8),
       width: 24,
       height: 24,
       decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.black)),
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.black, width: 1),
+      ),
     );
   }
 }

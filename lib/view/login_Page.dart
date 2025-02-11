@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                           Session().setUserLogin(value: true);
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) => const HomePage()),
+                                  builder: (context) => HomePage()),
                               (Route<dynamic> route) => false);
                         },
                         child: Text(
@@ -196,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
           await Session().setUserToken(value.data["access_token"]);
 
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const HomePage()),
+            MaterialPageRoute(builder: (_) => HomePage()),
             (Route<dynamic> route) => false,
           );
         }

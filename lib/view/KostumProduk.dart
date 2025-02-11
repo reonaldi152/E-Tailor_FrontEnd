@@ -1,164 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_application_1/view/Payment_screen.dart';
-import 'package:flutter_application_1/view/kostum_pakaian.dart';
+import 'package:flutter_application_1/models/product_model.dart';
+import 'package:flutter_application_1/viewmodels/custom_product_viewmodel.dart';
+import 'package:provider/provider.dart';
 
-class KostumProduk extends StatefulWidget {
-  const KostumProduk({Key? key}) : super(key: key);
-
-  @override
-  State<KostumProduk> createState() => _KostumProdukState();
-}
-
-class _KostumProdukState extends State<KostumProduk> {
-  final _formKey = GlobalKey<FormState>(); // Key untuk Form
+class KostumProdukScreen extends StatelessWidget {
+  const KostumProdukScreen({Key? key, required ProductModel product})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<KostumProdukViewModel>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('E - Tailor'),
-      ),
+      appBar: AppBar(title: const Text("E - Tailor")),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey, // Key untuk Form
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: Text(
-                  'Kostum Pakaian',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Image.asset(
-                'assets/Katun.jpeg',
-                height: 200,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Gambar Produk
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                "https://via.placeholder.com/350",
                 width: double.infinity,
+                height: 200,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, size: 200),
               ),
-              const SizedBox(height: 16),
-              const Center(
-                child: Text(
-                  'Bahan Kain',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // ... (TextFormField lainnya)
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Input',
-                ),
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                ],
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Provinsi',
-                ),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Kota',
-                ),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Kecamatan',
-                ),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Kode Pos',
-                ),
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                ],
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Alamat Lengkap',
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Validasi berhasil, tampilkan alert
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          content: const Text(
-                              'Apakah Anda ingin Kostumisasi Pakaian?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Tutup dialog
-                                // Navigasi ke halaman selanjutnya
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const PaymentScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text('Tidak'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Tutup dialog
-                                // Navigasi ke halaman selanjutnya
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const KostumPakaian(),
-                                  ),
-                                );
-                              },
-                              child: const Text('Ya'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                // ... (style tombol)
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4CAF50),
-                  textStyle: const TextStyle(
-                    color: Colors.white,
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 170),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'Lanjut',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+
+            // Nama Produk
+            const Text("Costum Pakaian",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+
+            // Input Ukuran
+            _buildMeasurementField(
+                context, "Lingkar Dada", viewModel.lingkarDadaController),
+            _buildMeasurementField(
+                context, "Panjang Muka", viewModel.panjangMukaController),
+            _buildMeasurementField(
+                context, "Lebar Muka", viewModel.lebarMukaController),
+            _buildMeasurementField(
+                context, "Lebar Bahu", viewModel.lebarBahuController),
+            _buildMeasurementField(context, "Lingkar Pinggang",
+                viewModel.lingkarPinggangController),
+            _buildMeasurementField(
+                context, "Lingkar Pinggul", viewModel.lingkarPinggulController),
+            _buildMeasurementField(
+                context, "Lingkar Ketiak", viewModel.lingkarKetiakController),
+            _buildMeasurementField(
+                context, "Lingkar Tangan", viewModel.lingkarTanganController),
+
+            const SizedBox(height: 16),
+          ],
         ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(10),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          onPressed: () => viewModel.submitData(context),
+          child: const Text("Lanjutkan Pembayaran",
+              style: TextStyle(fontSize: 18)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMeasurementField(
+      BuildContext context, String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(label, style: const TextStyle(fontSize: 16)),
+          ),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: controller,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(
+                hintText: "-",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
