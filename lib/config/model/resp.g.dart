@@ -13,7 +13,7 @@ Resp _$RespFromJson(Map<String, dynamic> json) => Resp(
       status: json['status'],
       data: json['data'],
       code: json['code'],
-      succes: json['succes'],
+      success: json['succes'],
     );
 
 Map<String, dynamic> _$RespToJson(Resp instance) => <String, dynamic>{
@@ -23,5 +23,5 @@ Map<String, dynamic> _$RespToJson(Resp instance) => <String, dynamic>{
       'response': instance.response,
       'data': instance.data,
       'code': instance.code,
-      'succes': instance.succes,
+      'succes': instance.success,
     };

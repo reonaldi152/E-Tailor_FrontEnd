@@ -150,10 +150,12 @@ class _LoginPageState extends State<LoginPage> {
                     : TextButton(
                         onPressed: () {
                           Session().setUserLogin(value: true);
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => HomePage()),
-                              (Route<dynamic> route) => false);
+                          // Navigator.of(context).pushAndRemoveUntil(
+                          //     MaterialPageRoute(
+                          //         builder: (context) => HomePage()),
+                          //     (Route<dynamic> route) => false);
+
+                          handleLogin();
                         },
                         child: Text(
                           "Masuk Sekarang",
@@ -190,9 +192,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void handleLogin() {
-    UserViewmodel().login().then(
+    UserViewmodel().login(email: emailController.text, password: passwordController.text).then(
       (value) async {
         if (value.code == 200) {
+          debugPrint("ini yaa ${value.data["access_token"]}");
           await Session().setUserToken(value.data["access_token"]);
 
           Navigator.of(context).pushAndRemoveUntil(

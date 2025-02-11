@@ -10,7 +10,7 @@ class Resp {
   dynamic response;
   dynamic data;
   dynamic code;
-  dynamic succes;
+  dynamic success;
 
   Resp({
     this.result,
@@ -19,7 +19,7 @@ class Resp {
     this.status,
     this.data,
     this.code,
-    this.succes,
+    this.success,
   });
 
   factory Resp.fromJson(Map<String, dynamic> json) => _$RespFromJson(json);

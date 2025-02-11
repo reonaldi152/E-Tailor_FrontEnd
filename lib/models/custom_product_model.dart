@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'custom_product.g.dart'; // Pastikan baris ini ada!
+part 'custom_product_model.g.dart'; // Pastikan baris ini ada!
 
 @JsonSerializable()
 class CustomProduct {

@@ -6,14 +6,12 @@ import '../models/product_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final ProductModel product;
-  final int input;
-  final int userId;
+  // final int input;
+  // final int userId;
+  // final dynamic productId;
 
   const CheckoutScreen({
-    Key? key,
-    required this.product,
-    required this.input,
-    required this.userId,
+    Key? key, required this.product
   }) : super(key: key);
 
   @override
@@ -34,7 +32,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
-    _quantityController.text = widget.input.toString();
     _calculateTotal();
 
     _quantityController.addListener(_calculateTotal);
@@ -55,7 +52,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _calculateTotal() {
     setState(() {
       int quantity = int.tryParse(_quantityController.text) ?? 0;
-      _totalPrice = (quantity * widget.product.price) as double;
+      _totalPrice = (quantity * double.parse(widget.product.price.toString()));
     });
   }
 
@@ -79,10 +76,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CustomProductView()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => CustomProductView()),
+                // );
               },
               child: const Text("Lanjutkan"),
             ),
@@ -188,4 +185,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
   }
+
+
 }

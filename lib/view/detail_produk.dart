@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/view/KostumProduk.dart';
 import 'package:flutter_application_1/view/checkout.dart';
 import '../models/product_model.dart';
 
@@ -103,23 +104,25 @@ class DetailPage extends StatelessWidget {
             int userId = 1; // Ubah sesuai dengan sistem login
 
             // Navigasi ke CheckoutScreen dengan parameter yang benar
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CheckoutScreen(
-                  product: product,
-                  input: inputJumlah,
-                  userId: userId,
-                ),
-              ),
-            );
+
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => CheckoutScreen(
+            //       product: product,
+            //       input: inputJumlah,
+            //       userId: userId,
+            //     ),
+            //   ),
+            // );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => CustomProductView(product: product,),));
           },
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.shopping_cart, color: Colors.white),
               SizedBox(width: 8),
-              Text("Lakukan Pembayaran", style: TextStyle(fontSize: 18)),
+              Text("Custom Product", style: TextStyle(fontSize: 18)),
             ],
           ),
         ),

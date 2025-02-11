@@ -1,25 +1,39 @@
+
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/custom_product_model.dart';
-import '../services/custom_product_service.dart';
 
-class CustomProductViewModel extends ChangeNotifier {
-  final CustomProductService _service = CustomProductService();
-  List<CustomProduct> _customProducts = [];
-  bool _isLoading = false;
+import '../config/endpoint.dart';
+import '../config/model/resp.dart';
+import '../config/network.dart';
+import '../config/pref.dart';
 
-  List<CustomProduct> get customProducts => _customProducts;
-  bool get isLoading => _isLoading;
+class CustomProductViewModel {
+  Future<Resp> customProduct({productId, name,lingkarDada,panjangMuka, lebarMuka, lebarBahu, lingkarPinggang, lingkarPinggul, lingkarKetiak, lingkarTangan}) async {
+    String? token = await Session().getUserToken();
+    var header = <String, dynamic>{};
+    header[HttpHeaders.authorizationHeader] = 'Bearer $token';
+    debugPrint(token);
 
-  Future<void> fetchCustomProducts() async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      _customProducts = await _service.fetchCustomProducts();
-    } catch (e) {
-      _customProducts = [];
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    Map<String, dynamic> formData = {
+      "product_id": productId,
+      "name": name,
+      "lingkar_dada": lingkarDada,
+      "panjang_muka": panjangMuka,
+      "lebar_muka": lebarMuka,
+      "lebar_bahu": lebarBahu,
+      "lingkar_pinggang": lingkarPinggang,
+      "lingkar_pinggul": lingkarPinggul,
+      "lingkar_ketiak": lingkarKetiak,
+      "lingkar_tangan": lingkarTangan,
+    };
+
+    // debugPrint(formData.toString());
+
+    var resp = await Network.postApiWithHeadersContentType(Endpoint.customProductUrl, formData, header);
+    // print("resp $resp");
+    var data = Resp.fromJson(resp);
+    return data;
   }
 }
