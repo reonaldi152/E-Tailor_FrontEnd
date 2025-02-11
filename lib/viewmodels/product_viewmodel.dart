@@ -11,8 +11,7 @@ class ProductViewModel extends ChangeNotifier {
 
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl:
-          "https://etaylor-admin.my.id/api", // Ganti dengan URL API yang benar
+      baseUrl: "https://etaylor-admin.my.id/api/",
       connectTimeout: 10000, // 10 detik dalam milidetik
       receiveTimeout: 10000, // 10 detik dalam milidetik
     ),

@@ -3,7 +3,7 @@ import '../models/product_model.dart';
 
 class ApiService {
   final Dio _dio =
-      Dio(BaseOptions(baseUrl: 'https://etaylor-admin.my.id/api/products'));
+      Dio(BaseOptions(baseUrl: 'https://etaylor-admin.my.id/api/'));
 
   Future<List<ProductModel>> fetchProducts() async {
     try {

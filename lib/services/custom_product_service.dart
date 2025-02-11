@@ -1,21 +1,22 @@
-import 'package:dio/dio.dart';
-import 'package:flutter_application_1/models/custom_product_model.dart';
+// import 'package:dio/dio.dart';
+// import 'package:flutter_application_1/models/custom_product_model.dart';
 
-class KostumProdukService {
-  final Dio _dio = Dio();
-  final String apiUrl = "https://your-backend.com/api/kostum";
+// class CustomProductService {
+//   final Dio _dio = Dio(
+//       BaseOptions(baseUrl: 'https://etaylor-admin.my.id/api/costume-products'));
 
-  Future<void> submitKostumProduk(KostumProdukModel kostumProduk) async {
-    try {
-      Response response = await _dio.post(apiUrl, data: kostumProduk.toJson());
-
-      if (response.statusCode == 200) {
-        print("Data berhasil dikirim!");
-      } else {
-        print("Gagal mengirim data.");
-      }
-    } catch (e) {
-      print("Error: ${e.toString()}");
-    }
-  }
-}
+//   Future<List<CustomProduct>> fetchCustomProducts() async {
+//     try {
+//       final response = await _dio.get('/custom-products');
+//       if (response.statusCode == 200) {
+//         return (response.data as List)
+//             .map((json) => CustomProduct.fromJson(json))
+//             .toList();
+//       } else {
+//         throw Exception("Failed to load custom products");
+//       }
+//     } catch (e) {
+//       throw Exception("Error: $e");
+//     }
+//   }
+// }
