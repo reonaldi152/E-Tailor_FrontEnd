@@ -1,78 +1,35 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import '../services/checkout_service.dart';
-import '../models/checkout.dart';
 
-class CheckoutViewModel extends ChangeNotifier {
-  final ApiService _apiService = ApiService();
-  List<CheckoutModel> _checkoutList = [];
-  CheckoutModel _checkoutData = CheckoutModel();
+import '../config/endpoint.dart';
+import '../config/model/resp.dart';
+import '../config/network.dart';
+import '../config/pref.dart';
 
-  List<CheckoutModel> get checkoutList => _checkoutList;
-  CheckoutModel get checkoutData => _checkoutData;
+class CheckoutViewModel {
+  Future<Resp> checkout({productId, quantity, provinsi, kota, kecamatan, kodePos, address,totalPrice}) async {
+    String? token = await Session().getUserToken();
+    var header = <String, dynamic>{};
+    header[HttpHeaders.authorizationHeader] = 'Bearer $token';
+    debugPrint(token);
 
-  void updateUserId(int value) {
-    _checkoutData.userId = value;
-    notifyListeners();
-  }
+    Map<String, dynamic> formData = {
+      "product_id": productId,
+      "quantity": quantity,
+      "provinsi": provinsi,
+      "kota": kota,
+      "kecamatan": kecamatan,
+      "kode_pos": kodePos,
+      "address": address,
+      "total_price": totalPrice,
+    };
 
-  void updateProductId(int value) {
-    _checkoutData.productId = value;
-    notifyListeners();
-  }
+    // debugPrint(formData.toString());
 
-  void updateInput(int value) {
-    _checkoutData.input = value;
-    notifyListeners();
-  }
-
-  void updateProvince(String value) {
-    _checkoutData.province = value;
-    notifyListeners();
-  }
-
-  void updateCity(String value) {
-    _checkoutData.city = value;
-    notifyListeners();
-  }
-
-  void updateDistrict(String value) {
-    _checkoutData.district = value;
-    notifyListeners();
-  }
-
-  void updatePostalCode(String value) {
-    _checkoutData.postalCode = value;
-    notifyListeners();
-  }
-
-  void updateAddress(String value) {
-    _checkoutData.address = value;
-    notifyListeners();
-  }
-
-  void updateTotalPrice(int value) {
-    _checkoutData.totalPrice = value;
-    notifyListeners();
-  }
-
-  // Fetch data dari API
-  Future<void> fetchCheckoutData(int userId) async {
-    try {
-      _checkoutList = await _apiService.fetchCheckout(userId);
-      notifyListeners();
-    } catch (e) {
-      print("Error fetching checkout data: $e");
-    }
-  }
-
-  // Kirim data ke API
-  Future<bool> submitCheckout() async {
-    try {
-      bool success = await _apiService.submitCheckout(_checkoutData);
-      return success;
-    } catch (e) {
-      print("Error submitting checkout: $e");
-      return false;
-    }
+    var resp = await Network.postApiWithHeadersContentType(Endpoint.checkoutsUrl, formData, header);
+    // print("resp $resp");
+    var data = Resp.fromJson(resp);
+    return data;
   }
 }

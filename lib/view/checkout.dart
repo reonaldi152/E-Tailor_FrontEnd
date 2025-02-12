@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/view/KostumProduk.dart';
 import 'package:flutter_application_1/view/Payment_screen.dart';
+import 'package:flutter_application_1/viewmodels/checkout_viewmodel.dart';
+import 'package:flutter_application_1/viewmodels/payment_viewmodel.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/product_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final ProductModel product;
-  // final int input;
-  // final int userId;
-  // final dynamic productId;
 
-  const CheckoutScreen({
-    Key? key, required this.product
-  }) : super(key: key);
+  const CheckoutScreen({Key? key, required this.product}) : super(key: key);
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -28,12 +25,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _addressController = TextEditingController();
 
   double _totalPrice = 0;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _calculateTotal();
-
     _quantityController.addListener(_calculateTotal);
   }
 
@@ -52,8 +48,75 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _calculateTotal() {
     setState(() {
       int quantity = int.tryParse(_quantityController.text) ?? 0;
-      _totalPrice = (quantity * double.parse(widget.product.price.toString()));
+      _totalPrice = quantity * double.parse(widget.product.price.toString());
     });
+  }
+
+  Future<void> handleCheckout() async {
+    // Validasi input terlebih dahulu
+
+    if (_quantityController.text.isEmpty ||
+        _provinceController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        _districtController.text.isEmpty ||
+        _postalCodeController.text.isEmpty ||
+        _addressController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harap isi semua field sebelum checkout."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final checkoutResponse = await CheckoutViewModel().checkout(
+        productId: widget.product.id,
+        quantity: _quantityController.text,
+        provinsi: _provinceController.text,
+        kota: _cityController.text,
+        kecamatan: _districtController.text,
+        kodePos: _postalCodeController.text,
+        address: _addressController.text,
+        totalPrice: _totalPrice,
+      );
+
+      if (checkoutResponse.message == "Checkout successfully created") {
+        final paymentResponse = await PaymentViewmodel().payment(
+          checkoutId: checkoutResponse.data['id'],
+        );
+
+        if (paymentResponse.message == "Transaction created successfully") {
+          String? paymentUrl = paymentResponse.data['payment_url'];
+
+          if (paymentUrl != null) {
+            Uri paymentUri = Uri.parse(paymentUrl);
+            if (await canLaunchUrl(paymentUri)) {
+              await launchUrl(paymentUri);
+            } else {
+              throw 'Could not launch payment URL';
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Checkout error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Terjadi kesalahan: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _showConfirmationDialog() {
@@ -64,22 +127,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           title: const Text("Konfirmasi Pembayaran"),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaymentScreen()),
-                );
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text("Batal"),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => CustomProductView()),
-                // );
+                handleCheckout();
               },
               child: const Text("Lanjutkan"),
             ),
@@ -111,7 +165,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   widget.product.image,
                   height: 150,
                   errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image, size: 150),
+                  const Icon(Icons.broken_image, size: 150),
                 ),
               ),
               const SizedBox(height: 10),
@@ -143,8 +197,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Text("Total: RP ${_totalPrice.toStringAsFixed(0)}",
                         style: const TextStyle(fontSize: 16)),
                     ElevatedButton(
-                      onPressed: _showConfirmationDialog,
-                      child: const Text("Konfirmasi Pembayaran"),
+                      onPressed: _isLoading ? null : _showConfirmationDialog,
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text("Konfirmasi Pembayaran"),
                     ),
                   ],
                 ),
@@ -185,6 +241,4 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
   }
-
-
 }
