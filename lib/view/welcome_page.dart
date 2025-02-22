@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/config/app_color.dart';
 import 'package:flutter_application_1/view/login_Page.dart';
 
 // Class for the welcome page
@@ -40,8 +41,12 @@ class WelcomePage extends StatelessWidget {
                   backgroundColor: Colors.blue,
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child:
-                    const Text('Masuk'), // Use "Masuk" for better translation
+                child: const Text(
+                  'Masuk',
+                  style: TextStyle(
+                    color: AppColor.white,
+                  ),
+                ), // Use "Masuk" for better translation
               ),
             ],
           ),

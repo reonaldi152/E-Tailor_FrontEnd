@@ -160,7 +160,6 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           "Masuk Sekarang",
                           style: fontTextStyle.copyWith(
-                            fontWeight: FontWeight.w600,
                             color: AppColor.white,
                             fontSize: 16,
                           ),
@@ -177,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const RegisterPage()));
+                                builder: (context) => RegisterScreen()));
                       },
                       child: Text("daftar sekarang",
                           style: fontTextStyle.copyWith(
@@ -192,7 +191,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void handleLogin() {
-    UserViewmodel().login(email: emailController.text, password: passwordController.text).then(
+    UserViewmodel()
+        .login(email: emailController.text, password: passwordController.text)
+        .then(
       (value) async {
         if (value.code == 200) {
           debugPrint("ini yaa ${value.data["access_token"]}");

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/view/Payment_screen.dart';
+import 'package:flutter_application_1/config/app_color.dart';
 import 'package:flutter_application_1/viewmodels/checkout_viewmodel.dart';
 import 'package:flutter_application_1/viewmodels/payment_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,26 +17,15 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _provinceController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _districtController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-
-  double _totalPrice = 0;
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _quantityController.addListener(_calculateTotal);
-  }
-
-  @override
   void dispose() {
-    _quantityController.removeListener(_calculateTotal);
-    _quantityController.dispose();
     _provinceController.dispose();
     _cityController.dispose();
     _districtController.dispose();
@@ -45,18 +34,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.dispose();
   }
 
-  void _calculateTotal() {
-    setState(() {
-      int quantity = int.tryParse(_quantityController.text) ?? 0;
-      _totalPrice = quantity * double.parse(widget.product.price.toString());
-    });
-  }
-
   Future<void> handleCheckout() async {
-    // Validasi input terlebih dahulu
-
-    if (_quantityController.text.isEmpty ||
-        _provinceController.text.isEmpty ||
+    if (_provinceController.text.isEmpty ||
         _cityController.text.isEmpty ||
         _districtController.text.isEmpty ||
         _postalCodeController.text.isEmpty ||
@@ -77,13 +56,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final checkoutResponse = await CheckoutViewModel().checkout(
         productId: widget.product.id,
-        quantity: _quantityController.text,
         provinsi: _provinceController.text,
         kota: _cityController.text,
         kecamatan: _districtController.text,
         kodePos: _postalCodeController.text,
         address: _addressController.text,
-        totalPrice: _totalPrice,
       );
 
       if (checkoutResponse.message == "Checkout successfully created") {
@@ -93,11 +70,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
         if (paymentResponse.message == "Transaction created successfully") {
           String? paymentUrl = paymentResponse.data['payment_url'];
-
           if (paymentUrl != null) {
             Uri paymentUri = Uri.parse(paymentUrl);
             if (await canLaunchUrl(paymentUri)) {
-              await launchUrl(paymentUri);
+              await launchUrl(paymentUri, mode: LaunchMode.externalApplication);
             } else {
               throw 'Could not launch payment URL';
             }
@@ -124,7 +100,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Konfirmasi Pembayaran"),
+          title: const Text(
+            "Konfirmasi Pembayaran",
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -165,7 +143,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   widget.product.image,
                   height: 150,
                   errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, size: 150),
+                      const Icon(Icons.broken_image, size: 150),
                 ),
               ),
               const SizedBox(height: 10),
@@ -177,12 +155,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildNumericTextField("Jumlah (Meter)",
-                  controller: _quantityController),
               _buildTextField("Provinsi", controller: _provinceController),
               _buildTextField("Kota", controller: _cityController),
               _buildTextField("Kecamatan", controller: _districtController),
-              _buildTextField("Kode Pos", controller: _postalCodeController),
+              _buildNumericTextField("Kode Pos",
+                  controller: _postalCodeController),
               _buildTextField("Alamat Lengkap", controller: _addressController),
               const SizedBox(height: 20),
               Container(
@@ -194,13 +171,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total: RP ${_totalPrice.toStringAsFixed(0)}",
-                        style: const TextStyle(fontSize: 16)),
                     ElevatedButton(
                       onPressed: _isLoading ? null : _showConfirmationDialog,
-                      child: _isLoading
-                          ? const CircularProgressIndicator()
-                          : const Text("Konfirmasi Pembayaran"),
+                      child: const Text("Konfirmasi Pembayaran"),
                     ),
                   ],
                 ),
@@ -217,7 +190,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
-        keyboardType: TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
