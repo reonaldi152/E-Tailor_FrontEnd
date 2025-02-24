@@ -3,10 +3,16 @@ import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/viewmodels/custom_product_viewmodel.dart';
 import 'checkout.dart';
 
-class CustomProductView extends StatelessWidget {
-  const CustomProductView({Key? key, required this.product}) : super(key: key);
+class CustomProductView extends StatefulWidget {
+  const CustomProductView({Key? key, required this.product, this.qty}) : super(key: key);
   final ProductModel product;
+  final dynamic qty;
 
+  @override
+  State<CustomProductView> createState() => _CustomProductViewState();
+}
+
+class _CustomProductViewState extends State<CustomProductView> {
   @override
   Widget build(BuildContext context) {
     final _controllers = {
@@ -32,7 +38,7 @@ class CustomProductView extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
-                      product.image,
+                      widget.product.image,
                       width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
@@ -42,7 +48,7 @@ class CustomProductView extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    product.name,
+                    widget.product.name,
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),
@@ -53,13 +59,13 @@ class CustomProductView extends StatelessWidget {
             for (var entry in _controllers.entries)
               _buildMeasurementField(context, entry.key, entry.value),
             Text(
-              'Harga: Rp ${product.price}',
+              'Harga: Rp ${widget.product.price}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () =>
-                  handleCustomProduct(context, product, _controllers),
+                  handleCustomProduct(context, widget.product, _controllers),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 minimumSize: const Size(double.infinity, 50),
@@ -156,7 +162,7 @@ class CustomProductView extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CheckoutScreen(product: product),
+            builder: (context) => CheckoutScreen(product: product, qty: widget.qty,),
           ),
         );
       } else {

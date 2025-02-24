@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = false;
       });
 
-      if (response.success) {
+      if (response.code == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Registrasi berhasil! Silakan login.")),
         );

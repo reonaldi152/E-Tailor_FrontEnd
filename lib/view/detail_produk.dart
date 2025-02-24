@@ -99,6 +99,7 @@ class DetailPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => CustomProductView(
+                              qty: inputJumlah,
                               product: ProductModel(
                                 id: product.id,
                                 name: product.name,

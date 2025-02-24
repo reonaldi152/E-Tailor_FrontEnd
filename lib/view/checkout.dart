@@ -8,8 +8,9 @@ import '../models/product_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final ProductModel product;
+  final dynamic qty;
 
-  const CheckoutScreen({Key? key, required this.product}) : super(key: key);
+  const CheckoutScreen({Key? key, required this.product, this.qty}) : super(key: key);
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -61,6 +62,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         kecamatan: _districtController.text,
         kodePos: _postalCodeController.text,
         address: _addressController.text,
+        totalPrice: widget.product.price,
+        quantity: widget.qty
       );
 
       if (checkoutResponse.message == "Checkout successfully created") {
@@ -72,11 +75,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           String? paymentUrl = paymentResponse.data['payment_url'];
           if (paymentUrl != null) {
             Uri paymentUri = Uri.parse(paymentUrl);
-            if (await canLaunchUrl(paymentUri)) {
-              await launchUrl(paymentUri, mode: LaunchMode.externalApplication);
-            } else {
-              throw 'Could not launch payment URL';
-            }
+            await launchUrl(paymentUri, mode: LaunchMode.externalApplication);
+
+            // if (await canLaunchUrl(paymentUri)) {
+            //   await launchUrl(paymentUri, mode: LaunchMode.externalApplication);
+            // } else {
+            //   throw 'Could not launch payment URL';
+            // }
           }
         }
       }
