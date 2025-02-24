@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "451646551892",
+    "project_id": "e-tailor-ed19b",
+    "storage_bucket": "e-tailor-ed19b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:451646551892:android:db5d49a513ccec83f0bac1",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOfaP6StgsuG8lMF584fhjaF8Y1gnHMgY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

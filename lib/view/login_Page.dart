@@ -150,11 +150,6 @@ class _LoginPageState extends State<LoginPage> {
                     : TextButton(
                         onPressed: () {
                           Session().setUserLogin(value: true);
-                          // Navigator.of(context).pushAndRemoveUntil(
-                          //     MaterialPageRoute(
-                          //         builder: (context) => HomePage()),
-                          //     (Route<dynamic> route) => false);
-
                           handleLogin();
                         },
                         child: Text(
