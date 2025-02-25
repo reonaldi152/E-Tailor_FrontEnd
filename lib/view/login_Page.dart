@@ -171,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RegisterScreen()));
+                                builder: (context) => RegisterPage()));
                       },
                       child: Text("daftar sekarang",
                           style: fontTextStyle.copyWith(

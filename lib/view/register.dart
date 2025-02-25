@@ -1,100 +1,405 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/model/resp.dart';
-import 'package:flutter_application_1/config/viewmodel/user_viewmodel.dart';
+import 'package:flutter_application_1/view/home_page.dart';
 
-class RegisterScreen extends StatefulWidget {
+import '../../config/app_color.dart';
+import '../../config/pref.dart';
+import '../viewmodels/auth_viewmodel.dart';
+import 'login_page.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterPageState extends State<RegisterPage> {
+  bool _passwordVisible = true, _passwordConfirmVisible = true;
+  String? passwordMatch, valueGender;
+  bool isLoading = false;
+  final Session _session = Session();
+  final TextEditingController namaController = TextEditingController(), emailController = TextEditingController(), passwordController = TextEditingController(), confirmPasswordController = TextEditingController(), noTelpController = TextEditingController(), addressController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final UserViewmodel _userViewmodel = UserViewmodel();
-  bool _isLoading = false;
 
-  void _register() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  RegExp get emailRegex => RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
-      Resp response = await _userViewmodel.register(
-        name: _nameController.text,
-        email: _emailController.text,
-        password: _passwordController.text,
-        phone: _phoneController.text,
-      );
+  RegExp passwordRegex =
+  RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~.,/]).{8,}$');
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (response.code == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registrasi berhasil! Silakan login.")),
-        );
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Gagal: ${response.message}")),
-        );
-      }
-    }
-  }
+  final List<String> _gender = [
+    "Laki-Laki",
+    "Perempuan"
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Register")),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: "Name"),
-                validator: (value) =>
-                    value!.isEmpty ? "Nama tidak boleh kosong" : null,
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: "Email"),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) => value!.isEmpty || !value.contains("@")
-                    ? "Masukkan email yang valid"
-                    : null,
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: "Password"),
-                obscureText: true,
-                validator: (value) =>
-                    value!.length < 6 ? "Password minimal 6 karakter" : null,
-              ),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(labelText: "Phone"),
-                keyboardType: TextInputType.phone,
-                validator: (value) =>
-                    value!.isEmpty ? "Nomor telepon tidak boleh kosong" : null,
-              ),
-              SizedBox(height: 20),
-              _isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _register,
-                      child: Text("Register"),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).padding.top + 32),
+                Center(
+                    child: Text(
+                      "Daftar Akun",
+                      style: fontTextStyle.copyWith(
+                        color: AppColor.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
+                const SizedBox(height: 16),
+                Text(
+                  "Daftar akun supaya bisa menggunakan fitur didalam aplikasi.",
+                  style: fontTextStyle.copyWith(color: Color(0xFF4F5E71)),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: TextButton(
+                //     onPressed: () {},
+                //     style: OutlinedButton.styleFrom(
+                //         side: const BorderSide(
+                //           width: 1,
+                //           color: Color(0xffE8EDF1),
+                //           style: BorderStyle.solid,
+                //         ),
+                //         backgroundColor: Colors.white,
+                //         padding: const EdgeInsets.symmetric(vertical: 12),
+                //         shape: const RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.all(Radius.circular(16)),
+                //         )),
+                //     child: Row(
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       children: [
+                //         Image.asset("assets/logo_google.png", width: 16),
+                //         const SizedBox(width: 8),
+                //         Text(
+                //           "Masuk dengan Google",
+                //           style: fontTextStyle.copyWith(
+                //             fontWeight: FontWeight.w700,
+                //             fontSize: 14,
+                //             color: const Color(0xff4F5E71),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(vertical: 16),
+                //   child: Center(
+                //     child: Text(
+                //       "atau",
+                //       style: fontTextStyle.copyWith(
+                //           color: const Color(0xFF878E97), fontSize: 12),
+                //     ),
+                //   ),
+                // ),
+                TextFormField(
+                    controller: namaController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      fillColor: AppColor.white,
+                      filled: true,
+                      labelStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintText: "Nama Lengkap",
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFFE8EDF1)),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                          borderRadius: BorderRadius.all(Radius.circular(16))),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                      ),
                     ),
-            ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama harus di isi';
+                      }
+                      return null;
+                    }),
+                const SizedBox(height: 16),
+                TextFormField(
+                    controller: emailController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      fillColor: AppColor.white,
+                      filled: true,
+                      labelStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintText: "Email",
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFFE8EDF1)),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                          borderRadius: BorderRadius.all(Radius.circular(16))),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email harus di isi';
+                      } else if (value.isNotEmpty) {
+                        if (!emailRegex.hasMatch(value)) {
+                          return 'Email tidak valid';
+                        }
+                      }
+                      return null;
+                    }),
+                const SizedBox(height: 16),
+                TextFormField(
+                    controller: noTelpController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      fillColor: AppColor.white,
+                      filled: true,
+                      labelStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintText: "No Telepon",
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFFE8EDF1)),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                          borderRadius: BorderRadius.all(Radius.circular(16))),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'No.Telp harus di isi';
+                      }
+                      return null;
+                    }),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: passwordController,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  obscureText: _passwordVisible,
+                  onChanged: (value) {
+                    setState(() {
+                      passwordMatch = value;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Kata Sandi harus di isi';
+                    } else {
+                      if (!passwordRegex.hasMatch(value)) {
+                        return 'Kata sandi wajib huruf besar, simbol, dan angka.';
+                      } else {
+                        return null;
+                      }
+                    }
+                  },
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                      fillColor: AppColor.white,
+                      filled: true,
+                      labelStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintStyle: fontTextStyle.copyWith(
+                          color: const Color(0xff878E97)),
+                      hintText: "Kata Sandi",
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFFE8EDF1)),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                          borderRadius: BorderRadius.all(Radius.circular(16))),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                      ),
+                      suffixIconColor: const Color(0xff324256),
+                      suffixIcon: IconButton(
+                          icon: Icon(_passwordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          })),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: confirmPasswordController,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  obscureText: _passwordConfirmVisible,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Konfirmasi Kata Sandi harus di isi';
+                    }
+                    if (value != passwordMatch) {
+                      return 'Kedua kata sandi harus sama';
+                    }
+                    return null;
+                  },
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    fillColor: AppColor.white,
+                    filled: true,
+                    labelStyle:
+                    fontTextStyle.copyWith(color: const Color(0xff878E97)),
+                    hintStyle:
+                    fontTextStyle.copyWith(color: const Color(0xff878E97)),
+                    hintText: "Konfirmasi Kata Sandi",
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE8EDF1)),
+                    ),
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                        borderRadius: BorderRadius.all(Radius.circular(16))),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFE8EDF1)),
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                    suffixIconColor: const Color(0xff324256),
+                    suffixIcon: IconButton(
+                      icon: Icon(_passwordConfirmVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _passwordConfirmVisible = !_passwordConfirmVisible;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 18, bottom: 30),
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: TextButton(
+                      onPressed: () {
+                        if (isLoading == false && _formKey.currentState!.validate()){
+                          setState(() {
+                            isLoading = true;
+                          });
+                          register();
+                        }
+
+                        // Session().setUserLogin(value: true);
+                        // Navigator.of(context).pushAndRemoveUntil(
+                        //     MaterialPageRoute(
+                        //         builder: (context) => const BasePage()),
+                        //         (Route<dynamic> route) => false);
+                      },
+                      child: isLoading ? const Center(child: CircularProgressIndicator(color: AppColor.white)) :Text(
+                        "Daftar Sekarang",
+                        style: fontTextStyle.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.white,
+                          fontSize: 16,
+                        ),
+                      )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Sudah memiliki akun? ",
+                        style: fontTextStyle.copyWith(
+                            color: const Color(0xFF4F5E71))),
+                    InkResponse(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()));
+                        },
+                        child: Text("masuk sekarang",
+                            style: fontTextStyle.copyWith(
+                                color: Colors.green)))
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // TextButton(
+                //     onPressed: () {},
+                //     child: Text(
+                //       "Nanti Saja",
+                //       style: fontTextStyle.copyWith(
+                //         fontWeight: FontWeight.w600,
+                //         color: AppColor.colorPrimaryYellow,
+                //       ),
+                //     )),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  register() {
+    AuthViewmodel()
+        .register(email: emailController.text, name: namaController.text, confirmPassword: confirmPasswordController.text, password: passwordController.text, phone: noTelpController.text, )
+        .then(
+          (response) async {
+        if (response.code == 200){
+          setState(() {
+            isLoading = false;
+          });
+          if (!mounted) return;
+
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => HomePage()),
+                  (Route<dynamic> route) => false);
+
+
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+
+        }
+      },
     );
   }
 }
