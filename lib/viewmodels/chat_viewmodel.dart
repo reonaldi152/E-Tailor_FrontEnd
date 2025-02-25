@@ -7,8 +7,8 @@ class ChatViewModel extends ChangeNotifier {
   List<MessageModel> _messages = [];
   List<MessageModel> get messages => _messages;
 
-  Stream<List<MessageModel>> listenToMessages(String chatRoomId) {
-    return _chatService.getMessages(chatRoomId);
+  Future<List> listenToMessages(String chatRoomId) {
+    return _chatService.getMessages();
   }
 
   Future<void> sendMessage(
@@ -19,6 +19,6 @@ class ChatViewModel extends ChangeNotifier {
       text: text,
       timestamp: DateTime.now(),
     );
-    await _chatService.sendMessage(chatRoomId, message);
+    await _chatService.sendMessage(message.toString());
   }
 }
