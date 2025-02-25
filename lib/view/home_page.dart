@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/view/chat_page.dart';
 import 'package:flutter_application_1/view/detail_produk.dart';
+import 'package:flutter_application_1/view/history_transaction_page.dart';
 import 'package:flutter_application_1/view/profile.dart';
 import 'package:flutter_application_1/view/riwayat_pemesanan.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,8 @@ class _HomePageState extends State<HomePage> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     HomePageContent(),
-    const RiwayatPembelianScreen(),
+    // const RiwayatPembelianScreen(),
+    TransactionHistoryPage(),
     ChatScreen(),
     const ProfilePage(),
   ];

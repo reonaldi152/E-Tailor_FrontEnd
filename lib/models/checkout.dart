@@ -1,23 +1,23 @@
 class CheckoutModel {
   int? id;
-  int? userId;
-  int? productId;
-  String? province;
-  String? city;
-  String? district;
-  String? postalCode;
+  int? user_id;
+  int? product_id;
+  String? provinsi;
+  String? kota;
+  String? kecamatan;
+  String? kode_pos;
   String? address;
   DateTime? createdAt;
   DateTime? updatedAt;
 
   CheckoutModel({
     this.id,
-    this.userId,
-    this.productId,
-    this.province,
-    this.city,
-    this.district,
-    this.postalCode,
+    this.user_id,
+    this.product_id,
+    this.provinsi,
+    this.kota,
+    this.kecamatan,
+    this.kode_pos,
     this.address,
     this.createdAt,
     this.updatedAt,
@@ -27,12 +27,12 @@ class CheckoutModel {
   factory CheckoutModel.fromJson(Map<String, dynamic> json) {
     return CheckoutModel(
       id: json['id'],
-      userId: json['user_id'],
-      productId: json['product_id'],
-      province: json['provinsi'],
-      city: json['kota'],
-      district: json['kecamatan'],
-      postalCode: json['kode_pos'],
+      user_id: json['user_id'],
+      product_id: json['product_id'],
+      provinsi: json['provinsi'],
+      kota: json['kota'],
+      kecamatan: json['kecamatan'],
+      kode_pos: json['kode_pos'],
       address: json['address'],
       createdAt: DateTime.tryParse(json['created_at'] ?? ''),
       updatedAt: DateTime.tryParse(json['updated_at'] ?? ''),
@@ -42,12 +42,12 @@ class CheckoutModel {
   // Konversi ke JSON (untuk mengirim data ke API)
   Map<String, dynamic> toJson() {
     return {
-      'user_id': userId,
-      'product_id': productId,
-      'provinsi': province,
-      'kota': city,
-      'kecamatan': district,
-      'kode_pos': postalCode,
+      'user_id': user_id,
+      'product_id': product_id,
+      'provinsi': provinsi,
+      'kota': kota,
+      'kecamatan': kecamatan,
+      'kode_pos': kode_pos,
       'address': address,
     };
   }
