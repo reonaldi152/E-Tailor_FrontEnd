@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/view/KostumProduk.dart';
 import '../models/product_model.dart';
+import 'checkout.dart';
 
 class DetailPage extends StatelessWidget {
   final ProductModel product;
@@ -95,24 +96,35 @@ class DetailPage extends StatelessWidget {
                             int.tryParse(inputController.text) ?? 1;
                         int totalHarga = inputJumlah * product.price;
                         Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CustomProductView(
-                              qty: inputJumlah,
-                              product: ProductModel(
-                                id: product.id,
-                                name: product.name,
-                                image: product.image,
-                                price: totalHarga,
-                                stock: product.stock,
-                                description: '',
-                                createdAt: DateTime.now(),
-                                updatedAt: DateTime.now(),
+
+                        if (inputJumlah >= 10){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CustomProductView(
+                                qty: inputJumlah,
+                                product: ProductModel(
+                                  id: product.id,
+                                  name: product.name,
+                                  image: product.image,
+                                  price: totalHarga,
+                                  stock: product.stock,
+                                  description: '',
+                                  createdAt: DateTime.now(),
+                                  updatedAt: DateTime.now(),
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        } else if (inputJumlah < 10){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CheckoutScreen(product: product, qty: inputJumlah,),
+                            ),
+                          );
+                        }
+
                       },
                       child: const Text("Lanjutkan"),
                     ),
