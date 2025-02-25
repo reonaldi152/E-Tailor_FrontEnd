@@ -4,7 +4,7 @@ import 'package:flutter_application_1/view/home_page.dart';
 import '../../config/app_color.dart';
 import '../../config/pref.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import 'login_page.dart';
+import 'login_Page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
